@@ -123,12 +123,18 @@ class TestHandWrittenClaims:
 
         from ehrlint.cli import app
 
-        runner = CliRunner()
+        # Rich wraps the help text to the terminal width and colours it, so a
+        # narrow or colour-capable terminal breaks `--fail-on` across lines and
+        # the flag never appears as a contiguous string. That is a property of
+        # the renderer, not of the CLI, so the environment is pinned rather
+        # than the assertion loosened.
+        env = {"COLUMNS": "200", "TERM": "dumb", "NO_COLOR": "1"}
+        runner = CliRunner(env=env)
         for command in ("audit", "synth", "validate-task", "list-checks"):
-            result = runner.invoke(app, [command, "--help"])
+            result = runner.invoke(app, [command, "--help"], env=env)
             assert result.exit_code == 0, command
 
-        audit_help = runner.invoke(app, ["audit", "--help"]).output
+        audit_help = runner.invoke(app, ["audit", "--help"], env=env).output
         for flag in (
             "--data",
             "--task",

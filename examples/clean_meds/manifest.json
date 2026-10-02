@@ -1,0 +1,17 @@
+{
+  "generator": "ehrlint.synth",
+  "n_subjects": 120,
+  "n_events": 1931,
+  "n_labels": 120,
+  "n_positive": 20,
+  "splits": {
+    "train": 72,
+    "valid": 24,
+    "test": 24
+  },
+  "n_feature_rows": 0,
+  "seed": 0,
+  "injected": [],
+  "task": "dka_2y",
+  "note": "Every record here is synthetic. Subjects are sequential, codes come from a fixed vocabulary, and timestamps derive from a constant epoch. No real patient record was involved."
+}

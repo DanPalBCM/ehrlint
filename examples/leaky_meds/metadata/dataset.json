@@ -1,0 +1,7 @@
+{
+  "dataset_name": "ehrlint-synthetic",
+  "dataset_version": "1.0.0",
+  "etl_name": "ehrlint.synth",
+  "etl_version": "1.0.0",
+  "meds_version": "0.4.1"
+}

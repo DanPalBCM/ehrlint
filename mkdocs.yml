@@ -1,0 +1,92 @@
+site_name: ehrlint
+site_description: Leakage auditor for EHR prediction tasks
+site_url: https://danpalbcm.github.io/ehrlint/
+repo_url: https://github.com/DanPalBCM/ehrlint
+repo_name: DanPalBCM/ehrlint
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: true
+            show_root_heading: true
+            docstring_style: google
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.details
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Concepts: concepts.md
+  - Task specs: task-spec.md
+  - The check battery:
+      - Overview: checks/index.md
+      - "LK001 post_index_features": checks/lk001.md
+      - "LK002 same_encounter": checks/lk002.md
+      - "LK003 outcome_proxy": checks/lk003.md
+      - "LK004 immortal_time": checks/lk004.md
+      - "LK005 split_overlap": checks/lk005.md
+      - "LK006 temporal_split": checks/lk006.md
+      - "LK007 label_definition": checks/lk007.md
+      - "LK008 encounter_group": checks/lk008.md
+      - "LK009 duplicate_subjects": checks/lk009.md
+      - "LK010 horizon_violation": checks/lk010.md
+  - Auditing:
+      - MEDS and OMOP ingestion: ingestion.md
+      - Feature matrices: features.md
+      - Labels and immortal time: labels.md
+      - Reading a report: reports.md
+  - Extending:
+      - Writing a custom check: custom-checks.md
+      - Synthetic data and injectors: synthetic-data.md
+  - Walkthroughs:
+      - MIMIC-IV demo: walkthroughs/mimic-iv.md
+  - Reference:
+      - API: api.md
+      - Limitations: limitations.md
+      - Decisions and deviations: decisions.md
+      - Changelog: changelog.md

@@ -1,0 +1,194 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install the project
+        run: uv sync --all-extras
+
+      - name: Run tests
+        # The full-scale §4.5 measurements need --run-slow and are not run
+        # here; the per-subject-cost tests that guard against a quadratic are.
+        run: uv run pytest -q --cov=ehrlint --cov-report=term-missing
+
+  lint:
+    name: lint and types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install the project
+        run: uv sync --all-extras
+
+      - name: ruff check
+        run: uv run ruff check .
+
+      - name: ruff format
+        run: uv run ruff format --check .
+
+      - name: mypy
+        run: uv run mypy
+
+  demo:
+    name: demo runs end to end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install the project
+        run: uv sync
+
+      # The demo is the project's own acceptance test. It audits the clean
+      # cohort (must pass), audits the leaky one (must fail), and checks every
+      # finding against the leaks ehrlint.inject planted -- so it exits
+      # non-zero if a check goes quiet or names the wrong subjects.
+      - name: Run the demo
+        run: uv run python demo.py
+
+      - name: Check the reports were produced
+        run: |
+          test -s demo_output/clean/report.html
+          test -s demo_output/clean/report.json
+          test -s demo_output/leaky/report.html
+          test -s demo_output/leaky/report.md
+          test -s demo_output/leaky/findings.jsonl
+
+      - name: Check the HTML report is a single offline file
+        run: |
+          if grep -qi '<script' demo_output/leaky/report.html; then
+            echo "The HTML report contains a script tag; it must be offline and JS-free."
+            exit 1
+          fi
+          if grep -q 'https\?://' demo_output/leaky/report.html; then
+            echo "The HTML report references an external resource."
+            exit 1
+          fi
+          grep -q 'data:image/png;base64,' demo_output/leaky/report.html
+
+      - name: Check the CLI exit codes are the documented contract
+        run: |
+          set +e
+          uv run ehrlint audit --data examples/clean_meds \
+            --task examples/clean_meds/task.yaml \
+            --labels examples/clean_meds/labels.parquet \
+            --splits examples/clean_meds/splits.json --quiet
+          clean=$?
+          uv run ehrlint audit --data examples/leaky_meds \
+            --task examples/leaky_meds/task.yaml \
+            --labels examples/leaky_meds/labels.parquet \
+            --splits examples/leaky_meds/splits.json \
+            --features examples/leaky_meds/features.parquet --quiet
+          leaky=$?
+          uv run ehrlint audit --data examples/clean_meds \
+            --task examples/clean_meds/task.yaml --checks LK999 --quiet
+          usage=$?
+          set -e
+          echo "clean=$clean leaky=$leaky usage=$usage"
+          test "$clean" -eq 0
+          test "$leaky" -eq 1
+          test "$usage" -eq 2
+
+      - name: Upload the demo reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-reports
+          path: demo_output/
+          retention-days: 14
+
+  no-real-data:
+    name: no patient data committed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install the project
+        run: uv sync
+
+      # Structural guard, not a vibe check: every code in a generated dataset
+      # comes from a fixed module-level vocabulary, every subject id is a
+      # sequential surrogate, and no free text is generated at all.
+      - name: Assert the only data is synthetic
+        run: uv run pytest tests/test_synth.py tests/test_demo.py -q
+
+      - name: Fail on data files outside examples/
+        run: |
+          stray=$(git ls-files \
+            | grep -E '\.(csv|tsv|jsonl|ndjson|parquet|feather|arrow|dta|sav|xpt|xlsx|sas7bdat|db|duckdb|sqlite)$' \
+            | grep -vE '^examples/' || true)
+          if [ -n "$stray" ]; then
+            echo "Data files found outside examples/:"
+            echo "$stray"
+            exit 1
+          fi
+          echo "No data files outside examples/."
+
+      - name: Every committed dataset declares its provenance
+        run: |
+          for dir in examples/*/; do
+            if [ ! -f "$dir/manifest.json" ]; then
+              echo "$dir has no manifest.json"; exit 1
+            fi
+            grep -q "No real patient record" "$dir/manifest.json" || {
+              echo "$dir/manifest.json does not state the data is synthetic"; exit 1; }
+          done
+          echo "Every examples/ dataset declares it is synthetic."
+
+  docs:
+    name: docs build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install the project
+        run: uv sync --all-extras
+
+      - name: Build the docs strictly
+        run: uv run mkdocs build --strict

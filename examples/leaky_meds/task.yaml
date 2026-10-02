@@ -1,0 +1,31 @@
+description: Synthetic two-year outcome task, for exercising ehrlint.
+exclusion: []
+followup:
+  allow_death_as_censoring: true
+  require_full_horizon_for_negatives: true
+horizon: 2y
+index:
+  code_system: VISIT
+  event: ed_visit
+  occurrence: first
+outcome:
+  codes:
+  - system: ICD10CM
+    values:
+    - E10.10
+    - E11.65
+  competing_codes:
+  - values:
+    - MEDS_DEATH
+  proxy_codes:
+  - system: PROCEDURE
+    values:
+    - insulin_drip
+  window:
+  - index_date
+  - index_date + 2y
+splits:
+  group_column: encounter_id
+  strategy: subject
+  temporal: true
+task: dka_2y

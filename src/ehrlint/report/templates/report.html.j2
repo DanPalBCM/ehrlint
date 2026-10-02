@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ehrlint audit · {{ task }}</title>
+<style>
+  :root {
+    --fg:#1a1d21; --muted:#5c6670; --bg:#fff; --panel:#f6f8fa; --line:#d8dee4;
+    --accent:#4C6EF5; --err-bg:#fdecea; --err-line:#C0392B;
+    --warn-bg:#fff8e1; --warn-line:#D4A017; --ok-bg:#edf7ee; --ok-line:#2E7D32;
+    --skip-bg:#f0f1f2; --skip-line:#7F8C8D; --info-bg:#eaf2fb; --info-line:#2E86C1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg:#e6e9ed; --muted:#9aa4af; --bg:#15181c; --panel:#1e2328; --line:#333a42;
+      --accent:#748ffc; --err-bg:#2e1d1b; --err-line:#e06c5f;
+      --warn-bg:#2e2a1a; --warn-line:#d4a017; --ok-bg:#1b2a1d; --ok-line:#6aba72;
+      --skip-bg:#23262a; --skip-line:#9aa4af; --info-bg:#1a2430; --info-line:#5dade2;
+    }
+    img { filter: brightness(.93); }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:2.2rem 1.4rem 5rem; background:var(--bg); color:var(--fg);
+         font:15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width:70rem; margin:0 auto; }
+  h1 { font-size:1.75rem; margin:0 0 .25rem; letter-spacing:-.01em; }
+  h2 { font-size:1.2rem; margin:2.4rem 0 .7rem; padding-bottom:.3rem; border-bottom:1px solid var(--line); }
+  h3 { font-size:1.02rem; margin:1.8rem 0 .5rem; }
+  .sub { color:var(--muted); font-size:.88rem; margin-bottom:1.6rem; }
+  code { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.86em;
+         background:var(--panel); padding:.1em .35em; border-radius:3px; }
+  pre { background:var(--panel); border:1px solid var(--line); border-radius:5px;
+        padding:.8rem 1rem; overflow-x:auto; font-size:.82rem; line-height:1.5; }
+  pre code { background:none; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:.6rem 0 1rem; font-size:.88rem; }
+  th, td { text-align:left; padding:.42rem .6rem; border-bottom:1px solid var(--line);
+           vertical-align:top; }
+  th { background:var(--panel); font-weight:600; white-space:nowrap; }
+  tbody tr:hover { background:var(--panel); }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .note { padding:.8rem 1rem; border-left:3px solid var(--accent); background:var(--panel);
+          border-radius:0 4px 4px 0; margin:.9rem 0; font-size:.89rem; }
+  .err  { border-left-color:var(--err-line);  background:var(--err-bg); }
+  .warn { border-left-color:var(--warn-line); background:var(--warn-bg); }
+  .ok   { border-left-color:var(--ok-line);   background:var(--ok-bg); }
+  .skip { border-left-color:var(--skip-line); background:var(--skip-bg); }
+  .info { border-left-color:var(--info-line); background:var(--info-bg); }
+  .note ul { margin:.4rem 0 0 1rem; padding:0; }
+  img { max-width:100%; height:auto; display:block; margin:1rem 0; border-radius:4px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr));
+          gap:.8rem; margin:1rem 0; }
+  .tile { background:var(--panel); border:1px solid var(--line); border-radius:5px;
+          padding:.75rem .9rem; }
+  .tile .k { font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .tile .v { font-size:1.3rem; font-weight:600; font-variant-numeric:tabular-nums; margin-top:.15rem; }
+  .badge { display:inline-block; padding:.08rem .45rem; border-radius:3px; font-size:.72rem;
+           font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#fff; }
+  .b-error { background:var(--err-line); } .b-warning { background:var(--warn-line); }
+  .b-info { background:var(--info-line); }
+  .finding { border:1px solid var(--line); border-radius:6px; padding:1rem 1.1rem; margin:1.1rem 0; }
+  .finding.error { border-left:4px solid var(--err-line); }
+  .finding.warning { border-left:4px solid var(--warn-line); }
+  .scroll { overflow-x:auto; }
+  details { margin:.6rem 0; } summary { cursor:pointer; color:var(--muted); font-size:.86rem; }
+  footer { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line);
+           color:var(--muted); font-size:.82rem; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>ehrlint audit</h1>
+<p class="sub">
+  task <code>{{ task }}</code> · data hash <code>{{ data_hash }}</code> ·
+  ehrlint {{ version }}{% if started %} · {{ started }}{% endif %} · {{ duration_s }}s
+</p>
+
+<div class="grid">
+  <div class="tile"><div class="k">subjects</div><div class="v">{{ summary.n_subjects }}</div></div>
+  <div class="tile"><div class="k">events</div><div class="v">{{ summary.n_events }}</div></div>
+  <div class="tile"><div class="k">checks run</div><div class="v">{{ summary.n_checks_run }}/{{ summary.n_checks_requested }}</div></div>
+  <div class="tile"><div class="k">errors</div><div class="v">{{ summary.n_errors }}</div></div>
+  <div class="tile"><div class="k">warnings</div><div class="v">{{ summary.n_warnings }}</div></div>
+  <div class="tile"><div class="k">skipped</div><div class="v">{{ summary.n_checks_skipped }}</div></div>
+</div>
+
+{% if ok %}
+<div class="note ok"><strong>No finding at or above <code>{{ fail_on }}</code>.</strong>
+  Exit code {{ exit_code }}.</div>
+{% else %}
+<div class="note err"><strong>{{ summary.n_errors }} error(s) and {{ summary.n_warnings }}
+  warning(s) fired.</strong> Exit code {{ exit_code }}, threshold <code>{{ fail_on }}</code>.</div>
+{% endif %}
+
+{% if skipped %}
+<div class="note skip">
+  <strong>{{ skipped | length }} of {{ summary.n_checks_requested }} checks did not run.</strong>
+  A skipped check is <strong>not</strong> a passed check. A clean result from an
+  incomplete audit is not reassurance — read the reasons below before trusting
+  anything above.
+</div>
+{% endif %}
+
+{% if warnings %}
+<div class="note warn">
+  <strong>Warnings about the inputs</strong>
+  <ul>{% for w in warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+{% if skipped %}
+<h2>Skipped checks</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>check</th><th>name</th><th>why it could not run</th></tr></thead>
+  <tbody>
+  {% for s in skipped %}
+    <tr><td><code>{{ s.check_id }}</code></td><td>{{ s.name }}</td><td>{{ s.reason }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+
+{% if figures.get('severity') %}
+<h2>Outcome</h2>
+<img src="{{ figures['severity'] }}" alt="Counts of checks by outcome: errors, warnings, passed, skipped">
+{% endif %}
+{% if figures.get('rates') %}
+<img src="{{ figures['rates'] }}" alt="Affected subject rate for each check that fired">
+{% endif %}
+
+{% if context %}
+<h2>Data</h2>
+<div class="scroll">
+<table>
+  <tbody>
+    <tr><th>source format</th><td><code>{{ context.get('source_format', 'unknown') }}</code></td></tr>
+    <tr><th>source path</th><td>{{ context.get('source_path') or 'in memory' }}</td></tr>
+    <tr><th>events</th><td>{{ context.get('n_events', 0) }} ({{ context.get('n_timed_events', 0) }} timed, {{ context.get('n_static_events', 0) }} static)</td></tr>
+    <tr><th>subjects</th><td>{{ context.get('n_subjects', 0) }}</td></tr>
+    <tr><th>index dates resolved</th><td>{{ context.get('n_index_dates', 0) }}</td></tr>
+    <tr><th>encounter ids present</th><td>{{ context.get('has_encounters', false) }}</td></tr>
+    <tr><th>code systems present</th><td>{{ context.get('has_code_systems', false) }}</td></tr>
+    {% if context.get('splits') %}<tr><th>splits</th><td>{{ context['splits'].get('sizes') }}</td></tr>{% endif %}
+    {% if context.get('features') %}<tr><th>feature matrix</th><td>{{ context['features'].get('n_rows') }} rows, {{ context['features'].get('n_features') }} features</td></tr>{% endif %}
+  </tbody>
+</table>
+</div>
+
+{% if context.get('task') %}
+<h3>Task definition</h3>
+<div class="scroll">
+<table>
+  <tbody>
+  {% for key, value in context['task'].items() %}
+    <tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+{% endif %}
+
+<h2>Findings</h2>
+{% if fired %}
+{% for f in fired %}
+<div class="finding {{ f.severity }}">
+  <h3><code>{{ f.check_id }}</code> {{ f.name }}
+    <span class="badge b-{{ f.severity }}">{{ f.severity }}</span></h3>
+  <p>{{ f.message }}</p>
+  <p><strong>Affected:</strong> {{ f.n_subjects }} of {{ f.n_total_subjects }} subject(s){% if f.rate_pct %} ({{ f.rate_pct }}){% endif %}, across {{ f.n_rows }} row(s).</p>
+
+  {% if metadata.get(f.check_id) and metadata[f.check_id].rationale %}
+  <div class="note"><strong>Why this matters.</strong> {{ metadata[f.check_id].rationale }}</div>
+  {% endif %}
+
+  <p><strong>The query that found it:</strong></p>
+  <pre><code>{{ f.query }}</code></pre>
+
+  {% if f.examples %}
+  <p><strong>Example rows</strong> — concrete rows from your data, not aggregates:</p>
+  <div class="scroll">
+  <table>
+    <thead><tr>{% for c in f.example_columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for row in f.examples %}
+      <tr>{% for c in f.example_columns %}<td>{{ row.get(c) if row.get(c) is not none else '' }}</td>{% endfor %}</tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endif %}
+
+  {% if f.subjects %}
+  <details><summary>Subject ids ({{ f.subjects | length }} shown)</summary>
+    <p>
+    {% for s in f.subjects[:50] %}<code>{{ s }}</code>{% if not loop.last %}, {% endif %}{% endfor %}
+    {%- if f.n_subjects > f.subjects | length %} &hellip;{% endif %}
+    </p>
+  </details>
+  {% endif %}
+
+  {% if f.detail %}
+  <details><summary>Detail</summary>
+    <table><tbody>
+    {% for key, value in f.detail.items() %}
+      <tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+    {% endfor %}
+    </tbody></table>
+  </details>
+  {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<div class="note ok">No check fired.{% if skipped %} Note that {{ skipped | length }}
+  check(s) were skipped and are not represented here.{% endif %}</div>
+{% endif %}
+
+{% if info %}
+<h2>Observations</h2>
+<div class="note info">Descriptive, not problems.</div>
+<div class="scroll">
+<table>
+  <thead><tr><th>check</th><th>name</th><th>observation</th></tr></thead>
+  <tbody>
+  {% for f in info %}
+    <tr><td><code>{{ f.check_id }}</code></td><td>{{ f.name }}</td><td>{{ f.message }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+
+{% if passed %}
+<h2>Checks that ran and found nothing</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>check</th><th>name</th><th>what was verified</th></tr></thead>
+  <tbody>
+  {% for f in passed %}
+    <tr><td><code>{{ f.check_id }}</code></td><td>{{ f.name }}</td><td>{{ f.message }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+
+<h2>How to read this</h2>
+<ul>
+  <li><strong>A skipped check is not a passed check.</strong> The summary counts them
+      separately for that reason.</li>
+  <li><strong>Every finding carries the rows that produced it.</strong> If a count has no
+      example rows beside it, that is a bug in ehrlint, not a subtle finding.</li>
+  <li><strong>The query is the whole logic.</strong> Run it against your data by hand to
+      confirm any finding independently.</li>
+  <li><strong>A clean audit does not mean a valid task.</strong> ehrlint checks known
+      leakage patterns, not every possible flaw in a study design.</li>
+</ul>
+
+<footer>
+  Generated by ehrlint {{ version }}. This page is a single self-contained file: figures
+  are inlined and there is no JavaScript. Data hash <code>{{ data_hash }}</code>.
+</footer>
+
+</main>
+</body>
+</html>

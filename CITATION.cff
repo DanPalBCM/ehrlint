@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use ehrlint in published work, please cite it as below."
+title: "ehrlint: a leakage auditor for EHR prediction tasks"
+abstract: >-
+  ehrlint audits a finished EHR prediction dataset for the leakage patterns
+  that make clinical models look good in a paper and fail in deployment:
+  post-index features, outcome codes from the index encounter, treatment
+  proxies, immortal time, subject and encounter overlap across splits,
+  duplicate patients under two identifiers, and outcomes counted beyond the
+  declared horizon. It reads MEDS or OMOP CDM input plus a task spec, runs ten
+  checks, and emits a report in which every finding references the concrete
+  rows that triggered it. Two rules are enforced in code: a finding without
+  evidence is rejected, and a check that cannot run reports a skip with a
+  reason rather than a pass. Cohort-extraction systems help define a task;
+  ehrlint audits one that already exists.
+type: software
+version: 1.0.0
+date-released: "2026-10-02"
+license: Apache-2.0
+repository-code: "https://github.com/DanPalBCM/ehrlint"
+url: "https://github.com/DanPalBCM/ehrlint"
+authors:
+  - family-names: Palacios
+    given-names: Daniel
+    affiliation: "Baylor College of Medicine"
+    email: daniel.palacios@bcm.edu
+keywords:
+  - clinical prediction models
+  - data leakage
+  - electronic health records
+  - MEDS
+  - OMOP common data model
+  - reproducibility
+  - machine learning validation

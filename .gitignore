@@ -1,0 +1,57 @@
+# --- generated output -------------------------------------------------
+# Anchored with a leading slash so they match only at the repository root.
+# An unanchored `report/` would also match `src/ehrlint/report/`, which is
+# package source, and would silently ship a broken package.
+/demo_output/
+/report/
+/reports/
+/site/
+/htmlcov/
+/dist/
+/build/
+*.egg-info/
+
+# --- data: nothing but the committed synthetic examples ----------------
+# ehrlint is a tool for clinical data, so the default is to ignore data and
+# allow back only what is known to be synthetic. A new `*.parquet` in a
+# working tree is far more likely to be a real extract than a new fixture.
+*.parquet
+*.csv
+*.tsv
+*.jsonl
+*.feather
+*.arrow
+*.db
+*.duckdb
+*.sqlite
+!examples/**/*.parquet
+!examples/**/*.csv
+!tests/**/*.parquet
+!tests/**/*.csv
+
+# The MIMIC-IV demo walkthrough downloads here at runtime. Nothing in it is
+# committed and no test depends on it.
+/mimic_demo/
+/data/
+
+# --- python -----------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.Python
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.coverage
+.coverage.*
+coverage.xml
+.tox/
+.nox/
+
+# --- editors and os ---------------------------------------------------
+.vscode/
+.idea/
+*.swp
+.DS_Store

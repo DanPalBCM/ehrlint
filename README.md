@@ -4,7 +4,8 @@
 
 [![ci](https://github.com/DanPalBCM/ehrlint/actions/workflows/ci.yml/badge.svg)](https://github.com/DanPalBCM/ehrlint/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/)
-[![license](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
+[![license](https://img.shields.io/badge/license-Apache--2.0-green)](https://github.com/DanPalBCM/ehrlint/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/ehrlint)](https://pypi.org/project/ehrlint/)
 
 Most published clinical prediction models have a quiet flaw: the features, the
 labels, or the splits leak information from the future. Post-index features,
@@ -274,12 +275,12 @@ dataset; changing the pipeline is your job.
 
 ## Documentation
 
-- [Getting started](docs/getting-started.md)
-- [The check reference](docs/checks/index.md) — rationale, query, and worked example per check
-- [Task specs](docs/task-spec.md)
-- [Reading a report](docs/reports.md)
-- [Writing a custom check](docs/custom-checks.md)
-- [Decisions and deviations](docs/decisions.md) — what was verified, what deviates from the spec, and why
+- [Getting started](https://github.com/DanPalBCM/ehrlint/blob/main/docs/getting-started.md)
+- [The check reference](https://github.com/DanPalBCM/ehrlint/blob/main/docs/checks/index.md) — rationale, query, and worked example per check
+- [Task specs](https://github.com/DanPalBCM/ehrlint/blob/main/docs/task-spec.md)
+- [Reading a report](https://github.com/DanPalBCM/ehrlint/blob/main/docs/reports.md)
+- [Writing a custom check](https://github.com/DanPalBCM/ehrlint/blob/main/docs/custom-checks.md)
+- [Decisions and deviations](https://github.com/DanPalBCM/ehrlint/blob/main/docs/decisions.md) — what was verified, what deviates from the spec, and why
 
 Build the site locally with `uv run mkdocs serve`.
 
@@ -296,7 +297,7 @@ Build the site locally with `uv run mkdocs serve`.
 
 ## Citation
 
-See [CITATION.cff](CITATION.cff).
+See [CITATION.cff](https://github.com/DanPalBCM/ehrlint/blob/main/CITATION.cff).
 
 ## License
 

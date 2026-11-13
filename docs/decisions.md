@@ -11,9 +11,9 @@ this file; it is also the page to read before trusting anything else here.
 `ehrlint` was unclaimed on PyPI and on GitHub when this project started. No
 alternative was needed, so no approval was sought.
 
-The project is released on GitHub only. There is no PyPI upload and no deployed
-documentation site, by decision — `pip install ehrlint` in the README describes
-what the package metadata supports, not a published artifact.
+The project was first released on GitHub only (2 October 2026). On 13 November
+2026 the owner revised that: v1.0.0 is published to PyPI, so `pip install
+ehrlint` installs a published artifact. See D-028.
 
 ### D-002 — The MEDS schema, read from the installed package
 
@@ -342,3 +342,18 @@ after the target. Reproduce with `uv run pytest --run-slow`.
 The default suite runs a smaller version that compares the per-subject cost at
 two cohort sizes, so a regression that makes a check quadratic is caught on
 every push rather than only in a scheduled job.
+
+
+### D-028 — Release scope revised: PyPI and Zenodo
+
+**Status:** decided by the project owner, 13 November 2026. Supersedes the GitHub-only release in D-001.
+
+v1.0.0 is published to PyPI from `.github/workflows/release.yml` using
+Trusted Publishing (OIDC), so no API token exists to leak. Publishing a GitHub
+Release publishes to PyPI, and the GitHub–Zenodo integration archives the same
+release and mints a DOI; a manual run of the workflow only builds and checks the
+distributions. The build job refuses to publish if the release tag differs from
+the `pyproject.toml` version, because a PyPI version can never be re-uploaded.
+The documentation is deployed to GitHub Pages by `.github/workflows/docs.yml`.
+The author contact email moved to a personal address, and the `v1.0.0` tag was
+moved to the release commit before any release or upload had used it.

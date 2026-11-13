@@ -15,7 +15,7 @@ abstract: >-
   ehrlint audits one that already exists.
 type: software
 version: 1.0.0
-date-released: "2026-10-02"
+date-released: "2026-11-13"
 license: Apache-2.0
 repository-code: "https://github.com/DanPalBCM/ehrlint"
 url: "https://github.com/DanPalBCM/ehrlint"
@@ -23,7 +23,7 @@ authors:
   - family-names: Palacios
     given-names: Daniel
     affiliation: "Baylor College of Medicine"
-    email: daniel.palacios@bcm.edu
+    email: danielpalaciosusa2015@hotmail.com
 keywords:
   - clinical prediction models
   - data leakage

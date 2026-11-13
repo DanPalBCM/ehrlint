@@ -9,7 +9,7 @@ description = "Leakage auditor for EHR prediction tasks: lint your clinical pred
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
-authors = [{ name = "Daniel Palacios", email = "daniel.palacios@bcm.edu" }]
+authors = [{ name = "Daniel Palacios", email = "danielpalaciosusa2015@hotmail.com" }]
 keywords = [
     "ehr",
     "clinical-prediction",
@@ -51,6 +51,8 @@ all = ["meds>=0.4,<0.5", "scikit-learn>=1.4"]
 Homepage = "https://github.com/DanPalBCM/ehrlint"
 Repository = "https://github.com/DanPalBCM/ehrlint"
 Issues = "https://github.com/DanPalBCM/ehrlint/issues"
+Changelog = "https://github.com/DanPalBCM/ehrlint/blob/main/CHANGELOG.md"
+Documentation = "https://danpalbcm.github.io/ehrlint/"
 
 [project.scripts]
 ehrlint = "ehrlint.cli:run"

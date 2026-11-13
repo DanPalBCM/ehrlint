@@ -6,6 +6,7 @@
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/)
 [![license](https://img.shields.io/badge/license-Apache--2.0-green)](https://github.com/DanPalBCM/ehrlint/blob/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/ehrlint)](https://pypi.org/project/ehrlint/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24203618.svg)](https://doi.org/10.5281/zenodo.24203618)
 
 Most published clinical prediction models have a quiet flaw: the features, the
 labels, or the splits leak information from the future. Post-index features,
@@ -298,6 +299,17 @@ Build the site locally with `uv run mkdocs serve`.
 ## Citation
 
 See [CITATION.cff](https://github.com/DanPalBCM/ehrlint/blob/main/CITATION.cff).
+
+```bibtex
+@software{ehrlint,
+  author  = {Palacios, Daniel},
+  title   = {ehrlint: a leakage auditor for EHR prediction tasks},
+  version = {1.0.0},
+  year    = {2026},
+  doi     = {10.5281/zenodo.24203618},
+  url     = {https://doi.org/10.5281/zenodo.24203618}
+}
+```
 
 ## License
 
